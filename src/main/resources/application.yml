@@ -15,3 +15,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+app:
+  integrations:
+    cnpja:
+      base-url: https://open.cnpja.com

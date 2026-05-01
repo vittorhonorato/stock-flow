@@ -1,5 +1,7 @@
 package com.vittorhonorato.stockflow.entity;
 
+import com.vittorhonorato.stockflow.exception.fornecedores.SituacaoCadastralFornecedorInvalidaException;
+
 import java.util.Arrays;
 
 public enum SituacaoCadastral {
@@ -26,10 +28,16 @@ public enum SituacaoCadastral {
     }
 
     public static SituacaoCadastral fromCodigo(Integer codigo) {
-        return Arrays.stream(SituacaoCadastral.values())
+        if (codigo == null) {
+            throw new SituacaoCadastralFornecedorInvalidaException(
+                    "Código da situação cadastral não pode ser nulo"
+            );
+        }
+
+        return Arrays.stream(values())
                 .filter(situacao -> situacao.codigo.equals(codigo))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new SituacaoCadastralFornecedorInvalidaException(
                         "Código de situação cadastral inválido: " + codigo
                 ));
     }
