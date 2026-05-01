@@ -81,7 +81,7 @@ public class FornecedorController {
     }
 
 
-    @PutMapping("desativar/{id}")
+    @PatchMapping("desativar/{id}")
     public ResponseEntity<Void> desativarFornecedor(
             @PathVariable Long id
     ) {

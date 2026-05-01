@@ -3,6 +3,8 @@ package com.vittorhonorato.stockflow.service.impl;
 import com.vittorhonorato.stockflow.dto.request.CategoriaRequestDTO;
 import com.vittorhonorato.stockflow.dto.response.CategoriaResponseDTO;
 import com.vittorhonorato.stockflow.entity.Categoria;
+import com.vittorhonorato.stockflow.exception.categorias.CategoriaDuplicadaException;
+import com.vittorhonorato.stockflow.exception.categorias.CategoriaNaoEncontradaException;
 import com.vittorhonorato.stockflow.mapper.CategoriaMapper;
 import com.vittorhonorato.stockflow.repository.CategoriaRepository;
 import com.vittorhonorato.stockflow.service.CategoriaService;
@@ -23,15 +25,19 @@ public class CategoriaServiceImpl implements CategoriaService {
 
     @Override
     public CategoriaResponseDTO criar(CategoriaRequestDTO categoriaRequestDTO) {
-        if (categoriaRepository.existsByNome(categoriaRequestDTO.nome())) {
-            throw new RuntimeException("Já existe uma categoria cadastrada com esse nome");
+        String nomeNormalizado = normalizarNome(categoriaRequestDTO.nome());
+
+        if (categoriaRepository.existsByNomeIgnoreCase(nomeNormalizado)) {
+            throw new CategoriaDuplicadaException("Já existe uma categoria cadastrada com esse nome");
         }
 
         Categoria categoria = categoriaMapper.toEntity(categoriaRequestDTO);
-        categoriaRepository.save(categoria);
+        categoria.setNome(nomeNormalizado);
+
+        Categoria categoriaSave = categoriaRepository.save(categoria);
 
 
-        return categoriaMapper.toResponseDTO(categoria);
+        return categoriaMapper.toResponseDTO(categoriaSave);
     }
 
     @Override
@@ -50,7 +56,23 @@ public class CategoriaServiceImpl implements CategoriaService {
 
     @Override
     public CategoriaResponseDTO atualizar(Long id, CategoriaRequestDTO categoriaRequestDTO) {
-        return null;
+        Categoria categoria = getCategoria(id);
+
+        String nomeNormalizado = normalizarNome(categoriaRequestDTO.nome());
+
+        boolean nomeFoiAlterado = !categoria.getNome().equalsIgnoreCase(nomeNormalizado);
+
+        if (nomeFoiAlterado && categoriaRepository.existsByNomeIgnoreCase(nomeNormalizado)) {
+            throw new CategoriaDuplicadaException(
+                    "Já existe uma categoria cadastrada com esse nome"
+            );
+        }
+
+        categoria.setNome(nomeNormalizado);
+
+        Categoria categoriaAtualizada = categoriaRepository.save(categoria);
+
+        return categoriaMapper.toResponseDTO(categoriaAtualizada);
     }
 
     @Override
@@ -63,7 +85,11 @@ public class CategoriaServiceImpl implements CategoriaService {
 
     private Categoria getCategoria(Long id) {
         return categoriaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Categoria não encontrada com o id:" + id));
+                .orElseThrow(() -> new CategoriaNaoEncontradaException("Categoria não encontrada com o id:" + id));
+    }
+
+    private String normalizarNome(String nome) {
+        return nome.trim();
     }
 
 

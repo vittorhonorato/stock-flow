@@ -1,5 +1,7 @@
 package com.vittorhonorato.stockflow.exception;
 
+import com.vittorhonorato.stockflow.exception.categorias.CategoriaDuplicadaException;
+import com.vittorhonorato.stockflow.exception.categorias.CategoriaNaoEncontradaException;
 import com.vittorhonorato.stockflow.exception.fornecedores.DocumentoFornecedorDuplicadoException;
 import com.vittorhonorato.stockflow.exception.fornecedores.DocumentoFornecedorInvalidoException;
 import com.vittorhonorato.stockflow.exception.fornecedores.FornecedorNaoEncontradoException;
@@ -18,6 +20,32 @@ import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(CategoriaNaoEncontradaException.class)
+    public ResponseEntity<ApiErrorResponse> handleCategoriaNaoEncontrada(
+            CategoriaNaoEncontradaException exception,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(
+                HttpStatus.NOT_FOUND,
+                exception.getMessage(),
+                request.getRequestURI(),
+                List.of()
+        );
+    }
+
+    @ExceptionHandler(CategoriaDuplicadaException.class)
+    public ResponseEntity<ApiErrorResponse> handleCategoriaDuplicada(
+            CategoriaDuplicadaException exception,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(
+                HttpStatus.CONFLICT,
+                exception.getMessage(),
+                request.getRequestURI(),
+                List.of()
+        );
+    }
 
     @ExceptionHandler(FornecedorNaoEncontradoException.class)
     public ResponseEntity<ApiErrorResponse> handleFornecedorNaoEncontrado(
