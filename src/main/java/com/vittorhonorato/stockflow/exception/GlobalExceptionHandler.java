@@ -6,6 +6,7 @@ import com.vittorhonorato.stockflow.exception.fornecedores.DocumentoFornecedorDu
 import com.vittorhonorato.stockflow.exception.fornecedores.DocumentoFornecedorInvalidoException;
 import com.vittorhonorato.stockflow.exception.fornecedores.FornecedorNaoEncontradoException;
 import com.vittorhonorato.stockflow.exception.fornecedores.SituacaoCadastralFornecedorInvalidaException;
+import com.vittorhonorato.stockflow.exception.produtos.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -90,6 +91,71 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SituacaoCadastralFornecedorInvalidaException.class)
     public ResponseEntity<ApiErrorResponse> handleSituacaoCadastralInvalida(
             SituacaoCadastralFornecedorInvalidaException exception,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage(),
+                request.getRequestURI(),
+                List.of()
+        );
+    }
+
+    @ExceptionHandler(ProdutoNaoEncontradoException.class)
+    public ResponseEntity<ApiErrorResponse> handleProdutoNaoEncontrado(
+            ProdutoNaoEncontradoException exception,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(
+                HttpStatus.NOT_FOUND,
+                exception.getMessage(),
+                request.getRequestURI(),
+                List.of()
+        );
+    }
+
+    @ExceptionHandler(ProdutoSkuDuplicadoException.class)
+    public ResponseEntity<ApiErrorResponse> handleProdutoSkuDuplicado(
+            ProdutoSkuDuplicadoException exception,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(
+                HttpStatus.CONFLICT,
+                exception.getMessage(),
+                request.getRequestURI(),
+                List.of()
+        );
+    }
+
+    @ExceptionHandler(ProdutoInvalidoException.class)
+    public ResponseEntity<ApiErrorResponse> handleProdutoInvalido(
+            ProdutoInvalidoException exception,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage(),
+                request.getRequestURI(),
+                List.of()
+        );
+    }
+
+    @ExceptionHandler(ProdutoCategoriaInativaException.class)
+    public ResponseEntity<ApiErrorResponse> handleProdutoCategoriaInativa(
+            ProdutoCategoriaInativaException exception,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage(),
+                request.getRequestURI(),
+                List.of()
+        );
+    }
+
+    @ExceptionHandler(ProdutoFornecedorInativoException.class)
+    public ResponseEntity<ApiErrorResponse> handleProdutoFornecedorInativo(
+            ProdutoFornecedorInativoException exception,
             HttpServletRequest request
     ) {
         return buildErrorResponse(
