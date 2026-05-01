@@ -8,6 +8,7 @@ import com.vittorhonorato.stockflow.entity.Fornecedor;
 import com.vittorhonorato.stockflow.entity.SituacaoCadastral;
 import com.vittorhonorato.stockflow.entity.TipoDocumento;
 import com.vittorhonorato.stockflow.exception.fornecedores.DocumentoFornecedorDuplicadoException;
+import com.vittorhonorato.stockflow.exception.fornecedores.DocumentoFornecedorInvalidoException;
 import com.vittorhonorato.stockflow.exception.fornecedores.FornecedorNaoEncontradoException;
 import com.vittorhonorato.stockflow.exception.fornecedores.SituacaoCadastralFornecedorInvalidaException;
 import com.vittorhonorato.stockflow.integration.cnpj.CnpjaClient;
@@ -145,7 +146,7 @@ public class FornecedorServiceImpl implements FornecedorService {
             FornecedorRequestDTO requestDTO
     ) {
         if(documentoNormalizado == null || documentoNormalizado.length() != 14) {
-            throw new RuntimeException("CNPJ inválido");
+            throw new DocumentoFornecedorInvalidoException("CNPJ inválido");
         }
 
         if(fornecedorRepository.existsByDocumento(documentoNormalizado)) {

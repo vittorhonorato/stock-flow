@@ -2,6 +2,8 @@ package com.vittorhonorato.stockflow.exception;
 
 import com.vittorhonorato.stockflow.exception.categorias.CategoriaDuplicadaException;
 import com.vittorhonorato.stockflow.exception.categorias.CategoriaNaoEncontradaException;
+import com.vittorhonorato.stockflow.exception.estoques.EstoqueInsuficienteException;
+import com.vittorhonorato.stockflow.exception.estoques.ProdutoInativoParaMovimentacaoException;
 import com.vittorhonorato.stockflow.exception.fornecedores.DocumentoFornecedorDuplicadoException;
 import com.vittorhonorato.stockflow.exception.fornecedores.DocumentoFornecedorInvalidoException;
 import com.vittorhonorato.stockflow.exception.fornecedores.FornecedorNaoEncontradoException;
@@ -156,6 +158,32 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ProdutoFornecedorInativoException.class)
     public ResponseEntity<ApiErrorResponse> handleProdutoFornecedorInativo(
             ProdutoFornecedorInativoException exception,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage(),
+                request.getRequestURI(),
+                List.of()
+        );
+    }
+
+    @ExceptionHandler(EstoqueInsuficienteException.class)
+    public ResponseEntity<ApiErrorResponse> handleEstoqueInsuficiente(
+            EstoqueInsuficienteException exception,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage(),
+                request.getRequestURI(),
+                List.of()
+        );
+    }
+
+    @ExceptionHandler(ProdutoInativoParaMovimentacaoException.class)
+    public ResponseEntity<ApiErrorResponse> handleProdutoInativoParaMovimentacao(
+            ProdutoInativoParaMovimentacaoException exception,
             HttpServletRequest request
     ) {
         return buildErrorResponse(
