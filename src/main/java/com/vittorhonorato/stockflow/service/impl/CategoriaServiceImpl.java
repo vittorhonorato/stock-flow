@@ -77,6 +77,7 @@ public class CategoriaServiceImpl implements CategoriaService {
             );
         }
 
+        categoriaMapper.updateEntityFromDTO(categoriaRequestDTO, categoria);
         categoria.setNome(nomeNormalizado);
 
         Categoria categoriaAtualizada = categoriaRepository.save(categoria);
@@ -100,6 +101,4 @@ public class CategoriaServiceImpl implements CategoriaService {
     private String normalizarNome(String nome) {
         return nome.trim();
     }
-
-
 }
