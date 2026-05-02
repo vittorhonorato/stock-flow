@@ -8,6 +8,8 @@ import com.vittorhonorato.stockflow.exception.fornecedores.DocumentoFornecedorDu
 import com.vittorhonorato.stockflow.exception.fornecedores.DocumentoFornecedorInvalidoException;
 import com.vittorhonorato.stockflow.exception.fornecedores.FornecedorNaoEncontradoException;
 import com.vittorhonorato.stockflow.exception.fornecedores.SituacaoCadastralFornecedorInvalidaException;
+import com.vittorhonorato.stockflow.exception.integration.CnpjaBadGatewayException;
+import com.vittorhonorato.stockflow.exception.integration.CnpjaServiceUnavailableException;
 import com.vittorhonorato.stockflow.exception.produtos.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -188,6 +190,32 @@ public class GlobalExceptionHandler {
     ) {
         return buildErrorResponse(
                 HttpStatus.BAD_REQUEST,
+                exception.getMessage(),
+                request.getRequestURI(),
+                List.of()
+        );
+    }
+
+    @ExceptionHandler(CnpjaBadGatewayException.class)
+    public ResponseEntity<ApiErrorResponse> handleCnpjaBadGateway(
+            CnpjaBadGatewayException exception,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(
+                HttpStatus.BAD_GATEWAY,
+                exception.getMessage(),
+                request.getRequestURI(),
+                List.of()
+        );
+    }
+
+    @ExceptionHandler(CnpjaServiceUnavailableException.class)
+    public ResponseEntity<ApiErrorResponse> handleCnpjaServiceUnavailable(
+            CnpjaServiceUnavailableException exception,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(
+                HttpStatus.SERVICE_UNAVAILABLE,
                 exception.getMessage(),
                 request.getRequestURI(),
                 List.of()
