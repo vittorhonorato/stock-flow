@@ -4,14 +4,17 @@ import com.vittorhonorato.stockflow.dto.request.ProdutoRequestDTO;
 import com.vittorhonorato.stockflow.dto.response.ProdutoResponseDTO;
 import com.vittorhonorato.stockflow.service.ProdutoService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/produtos")
+@CrossOrigin("*")
 public class ProdutoController {
 
     private final ProdutoService produtoService;
@@ -31,9 +34,11 @@ public class ProdutoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProdutoResponseDTO>> findAllProdutos() {
+    public ResponseEntity<Page<ProdutoResponseDTO>> findAllProdutos(
+            @PageableDefault(size = 5, sort = "id") Pageable pageable
+    ) {
 
-        List<ProdutoResponseDTO> response = produtoService.listAll();
+        Page<ProdutoResponseDTO> response = produtoService.listAll(pageable);
 
         return ResponseEntity.ok(response);
     }
@@ -61,12 +66,12 @@ public class ProdutoController {
     @PutMapping("atualizar/{id}")
     public ResponseEntity<ProdutoResponseDTO> atualizarProduto(
             @PathVariable Long id,
-            @RequestBody ProdutoRequestDTO request
+            @Valid @RequestBody ProdutoRequestDTO request
     ) {
 
-        produtoService.atualizar(id, request);
+        ProdutoResponseDTO response = produtoService.atualizar(id, request);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{id}/desativar")

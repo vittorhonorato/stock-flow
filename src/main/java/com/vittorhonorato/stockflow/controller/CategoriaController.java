@@ -4,6 +4,9 @@ import com.vittorhonorato.stockflow.dto.request.CategoriaRequestDTO;
 import com.vittorhonorato.stockflow.dto.response.CategoriaResponseDTO;
 import com.vittorhonorato.stockflow.service.CategoriaService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/categorias")
+@CrossOrigin("*")
 public class CategoriaController {
     private final CategoriaService categoriaService;
 
@@ -29,8 +33,10 @@ public class CategoriaController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CategoriaResponseDTO>> listarTodas() {
-        List<CategoriaResponseDTO> response = categoriaService.listarTodas();
+    public ResponseEntity<Page<CategoriaResponseDTO>> listarTodas(
+            @PageableDefault(size = 5 ) Pageable pageable
+    ) {
+        Page<CategoriaResponseDTO> response = categoriaService.listarTodas(pageable);
 
         return ResponseEntity.ok(response);
     }
@@ -61,5 +67,11 @@ public class CategoriaController {
         categoriaService.desativar(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/opcoes")
+    public ResponseEntity<List<CategoriaResponseDTO>> findAllOptions() {
+        List<CategoriaResponseDTO> response = categoriaService.findAllOptions();
+        return ResponseEntity.ok(response);
     }
 }

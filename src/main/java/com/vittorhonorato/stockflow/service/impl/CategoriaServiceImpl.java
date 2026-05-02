@@ -8,6 +8,8 @@ import com.vittorhonorato.stockflow.exception.categorias.CategoriaNaoEncontradaE
 import com.vittorhonorato.stockflow.mapper.CategoriaMapper;
 import com.vittorhonorato.stockflow.repository.CategoriaRepository;
 import com.vittorhonorato.stockflow.service.CategoriaService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,9 +43,16 @@ public class CategoriaServiceImpl implements CategoriaService {
     }
 
     @Override
-    public List<CategoriaResponseDTO> listarTodas() {
-        return categoriaRepository.findAll().stream()
-                .map(CategoriaMapper::toResponseDTO)
+    public Page<CategoriaResponseDTO> listarTodas(Pageable pageable) {
+        return categoriaRepository.findAll(pageable)
+                .map(categoriaMapper::toResponseDTO);
+    }
+
+    @Override
+    public List<CategoriaResponseDTO> findAllOptions() {
+        return categoriaRepository.findByAtivaTrueOrderByNomeAsc()
+                .stream()
+                .map(categoriaMapper::toResponseDTO)
                 .toList();
     }
 
@@ -51,7 +60,7 @@ public class CategoriaServiceImpl implements CategoriaService {
     public CategoriaResponseDTO buscaPorId(Long id) {
         Categoria categoria = getCategoria(id);
 
-        return CategoriaMapper.toResponseDTO(categoria);
+        return categoriaMapper.toResponseDTO(categoria);
     }
 
     @Override

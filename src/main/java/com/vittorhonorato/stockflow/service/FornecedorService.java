@@ -1,17 +1,17 @@
 package com.vittorhonorato.stockflow.service;
 
 import com.vittorhonorato.stockflow.dto.request.FornecedorRequestDTO;
-import com.vittorhonorato.stockflow.dto.request.ValidarDocumentoFornecedorRequestDTO;
 import com.vittorhonorato.stockflow.dto.response.FornecedorResponseDTO;
 import com.vittorhonorato.stockflow.dto.response.ValidacaoDocumentoFornecedorResponseDTO;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface FornecedorService {
     FornecedorResponseDTO criar(FornecedorRequestDTO request);
 
-    List<FornecedorResponseDTO> listarTodos();
+    Page<FornecedorResponseDTO> listarTodos(Pageable pageable);
 
     FornecedorResponseDTO buscarPorId(Long id);
 
@@ -24,4 +24,6 @@ public interface FornecedorService {
     ValidacaoDocumentoFornecedorResponseDTO validarDocumento(
             String request
     );
+
+    List<FornecedorResponseDTO> findAllOptions();
 }

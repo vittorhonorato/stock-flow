@@ -14,9 +14,9 @@ import com.vittorhonorato.stockflow.repository.HistoricoEstoqueRepository;
 import com.vittorhonorato.stockflow.repository.ProdutoRepository;
 import com.vittorhonorato.stockflow.service.EstoqueService;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class EstoqueServiceImpl implements EstoqueService {
@@ -106,7 +106,7 @@ public class EstoqueServiceImpl implements EstoqueService {
     }
 
     @Override
-    public List<HistoricoEstoqueResponseDTO> listaHistoricoPorProduto(Long produtoId) {
+    public Page<HistoricoEstoqueResponseDTO> listaHistoricoPorProduto(Long produtoId, Pageable pageable) {
 
         if (!produtoRepository.existsById(produtoId)) {
             throw new ProdutoNaoEncontradoException(
@@ -114,10 +114,8 @@ public class EstoqueServiceImpl implements EstoqueService {
             );
         }
 
-        return historicoEstoqueRepository.findByProdutoIdOrderByDataMovimentacaoDesc(produtoId)
-                .stream()
-                .map(historicoEstoqueMapper::toResponseDTO)
-                .toList();
+        return historicoEstoqueRepository.findByProdutoIdOrderByDataMovimentacaoDesc(produtoId, pageable)
+                .map(historicoEstoqueMapper::toResponseDTO);
     }
 
     private Produto buscarProdutoAtivo(Long id) {

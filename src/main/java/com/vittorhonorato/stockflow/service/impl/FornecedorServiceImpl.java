@@ -15,10 +15,13 @@ import com.vittorhonorato.stockflow.integration.cnpj.CnpjaClient;
 import com.vittorhonorato.stockflow.mapper.FornecedorMapper;
 import com.vittorhonorato.stockflow.repository.FornecedorRepository;
 import com.vittorhonorato.stockflow.service.FornecedorService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
 
 @Service
 public class FornecedorServiceImpl implements FornecedorService {
@@ -50,16 +53,15 @@ public class FornecedorServiceImpl implements FornecedorService {
     }
 
     @Override
-    public List<FornecedorResponseDTO> listarTodos() {
-        return fornecedorRepository.findAll().stream()
-                .map(FornecedorMapper::toResponseDTO)
-                .toList();
+    public Page<FornecedorResponseDTO> listarTodos(Pageable pageable) {
+        return fornecedorRepository.findAll(pageable)
+                .map(fornecedorMapper::toResponseDTO);
     }
 
     @Override
     public FornecedorResponseDTO buscarPorId(Long id) {
         return fornecedorRepository.findById(id)
-                .map(FornecedorMapper::toResponseDTO)
+                .map(fornecedorMapper::toResponseDTO)
                 .orElseThrow(() -> new FornecedorNaoEncontradoException("Fornecedor não encontrado com o id: " + id));
     }
 
@@ -68,7 +70,7 @@ public class FornecedorServiceImpl implements FornecedorService {
         String documentoNormalizado = normalizarDocumento(documento);
 
         return fornecedorRepository.findByDocumento(documentoNormalizado)
-                .map(FornecedorMapper::toResponseDTO)
+                .map(fornecedorMapper::toResponseDTO)
                 .orElseThrow(() -> new FornecedorNaoEncontradoException("Fornecedor não encontrado com o documento informado " + documentoNormalizado));
     }
 
@@ -94,7 +96,7 @@ public class FornecedorServiceImpl implements FornecedorService {
 
         Fornecedor fornecedorAtualizado = fornecedorRepository.save(fornecedor);
 
-        return FornecedorMapper.toResponseDTO(fornecedorAtualizado);
+        return fornecedorMapper.toResponseDTO(fornecedorAtualizado);
     }
 
     @Override
@@ -139,6 +141,14 @@ public class FornecedorServiceImpl implements FornecedorService {
                 permiteCadastro,
                 LocalDateTime.now()
         );
+    }
+
+    @Override
+    public List<FornecedorResponseDTO> findAllOptions() {
+        return fornecedorRepository.findByAtivoTrueOrderByNomeAsc()
+                .stream()
+                .map(fornecedorMapper::toResponseDTO)
+                .toList();
     }
 
     private void validarDocumentoParaCadastro(

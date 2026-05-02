@@ -5,6 +5,8 @@ import com.vittorhonorato.stockflow.dto.response.FornecedorResponseDTO;
 import com.vittorhonorato.stockflow.dto.response.ValidacaoDocumentoFornecedorResponseDTO;
 import com.vittorhonorato.stockflow.service.FornecedorService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/fornecedores")
+@CrossOrigin("*")
 public class FornecedorController {
 
     private final FornecedorService fornecedorService;
@@ -32,9 +35,9 @@ public class FornecedorController {
     }
 
     @GetMapping
-    public ResponseEntity<List<FornecedorResponseDTO>> getAllFornecedores() {
+    public ResponseEntity<Page<FornecedorResponseDTO>> getAllFornecedores(Pageable pageable) {
 
-        List<FornecedorResponseDTO> response = fornecedorService.listarTodos();
+        Page<FornecedorResponseDTO> response = fornecedorService.listarTodos(pageable);
 
         return ResponseEntity.ok(response);
     }
@@ -59,6 +62,13 @@ public class FornecedorController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/opcoes")
+    public ResponseEntity<List<FornecedorResponseDTO>> findAllOptions() {
+        List<FornecedorResponseDTO> response = fornecedorService.findAllOptions();
+
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("criar-fornecedor")
     public ResponseEntity<FornecedorResponseDTO> criarFornecedor(
             @Valid @RequestBody FornecedorRequestDTO fornecedorRequestDTO
@@ -77,7 +87,7 @@ public class FornecedorController {
 
         FornecedorResponseDTO atualizar = fornecedorService.atualizar(id, request);
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(atualizar);
+        return ResponseEntity.ok(atualizar);
     }
 
 

@@ -16,9 +16,11 @@ import com.vittorhonorato.stockflow.repository.CategoriaRepository;
 import com.vittorhonorato.stockflow.repository.FornecedorRepository;
 import com.vittorhonorato.stockflow.repository.ProdutoRepository;
 import com.vittorhonorato.stockflow.service.ProdutoService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+
 
 @Service
 public class ProdutoServiceImpl implements ProdutoService {
@@ -71,10 +73,9 @@ public class ProdutoServiceImpl implements ProdutoService {
     }
 
     @Override
-    public List<ProdutoResponseDTO> listAll() {
-        return produtoRepository.findAll().stream()
-                .map(produtoMapper::toResponseDTO)
-                .toList();
+    public Page<ProdutoResponseDTO> listAll(Pageable pageable) {
+        return produtoRepository.findAll(pageable)
+                .map(produtoMapper::toResponseDTO);
     }
 
     @Override

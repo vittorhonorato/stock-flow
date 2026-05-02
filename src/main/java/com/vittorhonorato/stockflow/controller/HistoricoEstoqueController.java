@@ -5,11 +5,13 @@ import com.vittorhonorato.stockflow.dto.request.MovimentacaoEstoqueRequestDTO;
 import com.vittorhonorato.stockflow.dto.response.HistoricoEstoqueResponseDTO;
 import com.vittorhonorato.stockflow.service.EstoqueService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+
 
 @RestController
 @RequestMapping("estoque")
@@ -52,12 +54,13 @@ public class HistoricoEstoqueController {
     }
 
     @GetMapping("/produtos/{produtoId}/historico")
-    public ResponseEntity<List<HistoricoEstoqueResponseDTO>> listAllHistorico(
-            @PathVariable Long produtoId
+    public ResponseEntity<Page<HistoricoEstoqueResponseDTO>> listAllHistorico(
+            @PathVariable Long produtoId,
+            Pageable pageable
     ) {
 
-        List<HistoricoEstoqueResponseDTO> response =
-                estoqueService.listaHistoricoPorProduto(produtoId);
+        Page<HistoricoEstoqueResponseDTO> response =
+                estoqueService.listaHistoricoPorProduto(produtoId, pageable);
 
         return ResponseEntity.ok(response);
     }

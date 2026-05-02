@@ -25,7 +25,7 @@ public class FornecedorMapper {
         return fornecedor;
     }
 
-    public static FornecedorResponseDTO toResponseDTO(Fornecedor fornecedor) {
+    public FornecedorResponseDTO toResponseDTO(Fornecedor fornecedor) {
         return new FornecedorResponseDTO(
                 fornecedor.getId(),
                 fornecedor.getNome(),
