@@ -34,6 +34,15 @@ public class Fornecedor {
     @Column(name = "telefone", length = 20)
     private String telefone;
 
+    @Column(name = "street", length = 255)
+    private String street;
+
+    @Column(name = "city", length = 120)
+    private String city;
+
+    @Column(name = "state", length = 2)
+    private String state;
+
     @Column(name = "ativo", nullable = false)
     private Boolean ativo = true;
 
@@ -95,6 +104,18 @@ public class Fornecedor {
         return telefone;
     }
 
+    public String getStreet() {
+        return street;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getState() {
+        return state;
+    }
+
     public Boolean getAtivo() {
         return ativo;
     }
@@ -141,6 +162,18 @@ public class Fornecedor {
 
     public void setTelefone(String telefone) {
         this.telefone = telefone;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 
     public void setAtivo(Boolean ativo) {

@@ -28,6 +28,15 @@ public record FornecedorRequestDTO(
         String email,
 
         @Size(max = 20, message = "O telefone deve ter no máximo 20 caracteres")
-        String telefone
+        String telefone,
+
+        @Size(max = 255, message = "O endereço deve ter no máximo 255 caracteres")
+        String street,
+
+        @Size(max = 120, message = "A cidade deve ter no máximo 120 caracteres")
+        String city,
+
+        @Size(max = 2, message = "A UF deve ter no máximo 2 caracteres")
+        String state
 ) {
 }

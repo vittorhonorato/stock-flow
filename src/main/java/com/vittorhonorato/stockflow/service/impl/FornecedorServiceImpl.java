@@ -119,6 +119,11 @@ public class FornecedorServiceImpl implements FornecedorService {
                     null,
                     documentoNormalizado,
                     null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
                     false,
                     false,
                     LocalDateTime.now()
@@ -131,11 +136,21 @@ public class FornecedorServiceImpl implements FornecedorService {
 
         boolean documentoValido = response.taxId() != null;
         boolean permiteCadastro = situacaoCadastral == SituacaoCadastral.ATIVA;
+        String email = extrairEmail(response);
+        String telefone = extrairTelefone(response);
+        String street = response.address() != null ? response.address().street() : null;
+        String city = response.address() != null ? response.address().city() : null;
+        String state = response.address() != null ? response.address().state() : null;
 
         return new ValidacaoDocumentoFornecedorResponseDTO(
                 response.company().name(),
                 TipoDocumento.CNPJ,
                 response.taxId(),
+                email,
+                telefone,
+                street,
+                city,
+                state,
                 situacaoCadastral,
                 documentoValido,
                 permiteCadastro,
@@ -174,5 +189,39 @@ public class FornecedorServiceImpl implements FornecedorService {
         }
 
         return documento.replaceAll("\\D", "");
+    }
+
+    private String extrairEmail(CnpjaOfficeResponseDTO response) {
+        if (response.emails() == null || response.emails().isEmpty()) {
+            return null;
+        }
+
+        return response.emails().stream()
+                .map(email -> email.address())
+                .filter(address -> address != null && !address.isBlank())
+                .findFirst()
+                .orElse(null);
+    }
+
+    private String extrairTelefone(CnpjaOfficeResponseDTO response) {
+        if (response.phones() == null || response.phones().isEmpty()) {
+            return null;
+        }
+
+        return response.phones().stream()
+                .map(phone -> {
+                    if (phone.number() == null || phone.number().isBlank()) {
+                        return null;
+                    }
+
+                    if (phone.area() == null || phone.area().isBlank()) {
+                        return phone.number();
+                    }
+
+                    return phone.area() + phone.number();
+                })
+                .filter(number -> number != null && !number.isBlank())
+                .findFirst()
+                .orElse(null);
     }
 }

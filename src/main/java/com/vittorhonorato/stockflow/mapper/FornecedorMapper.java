@@ -19,6 +19,9 @@ public class FornecedorMapper {
         fornecedor.setSituacaoCadastral(requestDTO.situacaoCadastral());
         fornecedor.setEmail(requestDTO.email());
         fornecedor.setTelefone(requestDTO.telefone());
+        fornecedor.setStreet(requestDTO.street());
+        fornecedor.setCity(requestDTO.city());
+        fornecedor.setState(requestDTO.state());
         fornecedor.setAtivo(true);
         fornecedor.setDataUltimaValidacao(LocalDateTime.now());
 
@@ -34,6 +37,9 @@ public class FornecedorMapper {
                 fornecedor.getSituacaoCadastral(),
                 fornecedor.getEmail(),
                 fornecedor.getTelefone(),
+                fornecedor.getStreet(),
+                fornecedor.getCity(),
+                fornecedor.getState(),
                 fornecedor.getAtivo(),
                 fornecedor.getDataUltimaValidacao(),
                 fornecedor.getDataCriacao(),
@@ -48,6 +54,9 @@ public class FornecedorMapper {
         fornecedor.setSituacaoCadastral(request.situacaoCadastral());
         fornecedor.setEmail(request.email());
         fornecedor.setTelefone(request.telefone());
+        fornecedor.setStreet(request.street());
+        fornecedor.setCity(request.city());
+        fornecedor.setState(request.state());
         fornecedor.setDataUltimaValidacao(LocalDateTime.now());
     }
 }
