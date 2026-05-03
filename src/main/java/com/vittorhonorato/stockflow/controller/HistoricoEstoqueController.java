@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("estoque")
+@CrossOrigin("*")
 public class HistoricoEstoqueController {
 
     private final EstoqueService estoqueService;

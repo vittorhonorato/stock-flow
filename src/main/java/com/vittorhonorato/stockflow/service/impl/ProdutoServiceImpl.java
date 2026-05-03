@@ -113,6 +113,14 @@ public class ProdutoServiceImpl implements ProdutoService {
         Fornecedor fornecedor = fornecedorRepository.findById(requestDTO.fornecedorId())
                 .orElseThrow(() -> new FornecedorNaoEncontradoException("Fornecedor não encontrado com o id: " + requestDTO.fornecedorId()));
 
+        if (!categoria.getAtiva()) {
+            throw new ProdutoCategoriaInativaException("Não é possível atualizar produto para categoria inativa");
+        }
+
+        if (!fornecedor.getAtivo()) {
+            throw new ProdutoFornecedorInativoException("Não é possível atualizar produto com fornecedor inativo");
+        }
+
 
         produtoMapper.updateEntityFromDTO(requestDTO, produto);
         produto.setNome(nomeNormalizado);
