@@ -1,10 +1,12 @@
 package com.vittorhonorato.stockflow.integration.cnpj.impl;
 
+import com.vittorhonorato.stockflow.config.CacheNames;
 import com.vittorhonorato.stockflow.dto.external.cnpja.CnpjaOfficeResponseDTO;
 import com.vittorhonorato.stockflow.exception.integration.CnpjaBadGatewayException;
 import com.vittorhonorato.stockflow.exception.integration.CnpjaServiceUnavailableException;
 import com.vittorhonorato.stockflow.integration.cnpj.CnpjaClient;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
@@ -27,6 +29,7 @@ public class CnpjaClientImpl implements CnpjaClient {
     }
 
     @Override
+    @Cacheable(cacheNames = CacheNames.CNPJA_CONSULTA, key = "#documento", unless = "#result == null")
     public CnpjaOfficeResponseDTO consultarCnpj(String documento) {
         try {
             return restClient.get()

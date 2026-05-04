@@ -1,5 +1,6 @@
 package com.vittorhonorato.stockflow.service.impl;
 
+import com.vittorhonorato.stockflow.config.CacheNames;
 import com.vittorhonorato.stockflow.dto.external.cnpja.CnpjaOfficeResponseDTO;
 import com.vittorhonorato.stockflow.dto.request.FornecedorRequestDTO;
 import com.vittorhonorato.stockflow.dto.response.FornecedorResponseDTO;
@@ -15,6 +16,8 @@ import com.vittorhonorato.stockflow.integration.cnpj.CnpjaClient;
 import com.vittorhonorato.stockflow.mapper.FornecedorMapper;
 import com.vittorhonorato.stockflow.repository.FornecedorRepository;
 import com.vittorhonorato.stockflow.service.FornecedorService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -37,6 +40,7 @@ public class FornecedorServiceImpl implements FornecedorService {
     }
 
     @Override
+    @CacheEvict(cacheNames = CacheNames.FORNECEDORES_OPCOES, allEntries = true)
     public FornecedorResponseDTO criar(FornecedorRequestDTO request) {
         String documentoNormalizado =  normalizarDocumento(request.documento());
 
@@ -75,6 +79,7 @@ public class FornecedorServiceImpl implements FornecedorService {
     }
 
     @Override
+    @CacheEvict(cacheNames = CacheNames.FORNECEDORES_OPCOES, allEntries = true)
     public FornecedorResponseDTO atualizar(Long id, FornecedorRequestDTO request) {
         Fornecedor fornecedor = fornecedorRepository.findById(id)
                 .orElseThrow(() -> new FornecedorNaoEncontradoException("Fornecedor não encontrado com o id: " + id));
@@ -100,6 +105,7 @@ public class FornecedorServiceImpl implements FornecedorService {
     }
 
     @Override
+    @CacheEvict(cacheNames = CacheNames.FORNECEDORES_OPCOES, allEntries = true)
     public void desativar(Long id) {
         Fornecedor fornecedor = fornecedorRepository.findById(id)
                 .orElseThrow(() -> new FornecedorNaoEncontradoException("Fornecedor não encontrado com o id: " + id));
@@ -159,6 +165,7 @@ public class FornecedorServiceImpl implements FornecedorService {
     }
 
     @Override
+    @Cacheable(cacheNames = CacheNames.FORNECEDORES_OPCOES)
     public List<FornecedorResponseDTO> findAllOptions() {
         return fornecedorRepository.findByAtivoTrueOrderByNomeAsc()
                 .stream()

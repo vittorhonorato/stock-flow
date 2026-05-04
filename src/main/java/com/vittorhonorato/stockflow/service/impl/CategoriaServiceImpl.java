@@ -1,5 +1,6 @@
 package com.vittorhonorato.stockflow.service.impl;
 
+import com.vittorhonorato.stockflow.config.CacheNames;
 import com.vittorhonorato.stockflow.dto.request.CategoriaRequestDTO;
 import com.vittorhonorato.stockflow.dto.response.CategoriaResponseDTO;
 import com.vittorhonorato.stockflow.entity.Categoria;
@@ -8,6 +9,8 @@ import com.vittorhonorato.stockflow.exception.categorias.CategoriaNaoEncontradaE
 import com.vittorhonorato.stockflow.mapper.CategoriaMapper;
 import com.vittorhonorato.stockflow.repository.CategoriaRepository;
 import com.vittorhonorato.stockflow.service.CategoriaService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,6 +29,7 @@ public class CategoriaServiceImpl implements CategoriaService {
     }
 
     @Override
+    @CacheEvict(cacheNames = CacheNames.CATEGORIAS_OPCOES, allEntries = true)
     public CategoriaResponseDTO criar(CategoriaRequestDTO categoriaRequestDTO) {
         String nomeNormalizado = normalizarNome(categoriaRequestDTO.nome());
 
@@ -49,6 +53,7 @@ public class CategoriaServiceImpl implements CategoriaService {
     }
 
     @Override
+    @Cacheable(cacheNames = CacheNames.CATEGORIAS_OPCOES)
     public List<CategoriaResponseDTO> findAllOptions() {
         return categoriaRepository.findByAtivaTrueOrderByNomeAsc()
                 .stream()
@@ -64,6 +69,7 @@ public class CategoriaServiceImpl implements CategoriaService {
     }
 
     @Override
+    @CacheEvict(cacheNames = CacheNames.CATEGORIAS_OPCOES, allEntries = true)
     public CategoriaResponseDTO atualizar(Long id, CategoriaRequestDTO categoriaRequestDTO) {
         Categoria categoria = getCategoria(id);
 
@@ -86,6 +92,7 @@ public class CategoriaServiceImpl implements CategoriaService {
     }
 
     @Override
+    @CacheEvict(cacheNames = CacheNames.CATEGORIAS_OPCOES, allEntries = true)
     public void desativar(Long id) {
         Categoria categoria = getCategoria(id);
 
