@@ -9,6 +9,7 @@ import com.vittorhonorato.stockflow.exception.categorias.CategoriaNaoEncontradaE
 import com.vittorhonorato.stockflow.exception.fornecedores.FornecedorNaoEncontradoException;
 import com.vittorhonorato.stockflow.exception.produtos.ProdutoCategoriaInativaException;
 import com.vittorhonorato.stockflow.exception.produtos.ProdutoFornecedorInativoException;
+import com.vittorhonorato.stockflow.exception.produtos.ProdutoInvalidoException;
 import com.vittorhonorato.stockflow.exception.produtos.ProdutoNaoEncontradoException;
 import com.vittorhonorato.stockflow.exception.produtos.ProdutoSkuDuplicadoException;
 import com.vittorhonorato.stockflow.mapper.ProdutoMapper;
@@ -97,6 +98,10 @@ public class ProdutoServiceImpl implements ProdutoService {
     @Override
     public ProdutoResponseDTO atualizar(Long id, ProdutoRequestDTO requestDTO) {
         Produto produto = getProduto(id);
+
+        if (!produto.getAtivo()) {
+            throw new ProdutoInvalidoException("Não é possível atualizar um produto inativo");
+        }
 
         String nomeNormalizado = normalizarTexto(requestDTO.nome());
         String skuNormalizado = normalizarTexto(requestDTO.sku());
