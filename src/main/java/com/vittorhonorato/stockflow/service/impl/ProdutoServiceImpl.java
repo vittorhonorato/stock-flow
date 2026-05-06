@@ -12,6 +12,8 @@ import com.vittorhonorato.stockflow.exception.produtos.ProdutoFornecedorInativoE
 import com.vittorhonorato.stockflow.exception.produtos.ProdutoInvalidoException;
 import com.vittorhonorato.stockflow.exception.produtos.ProdutoNaoEncontradoException;
 import com.vittorhonorato.stockflow.exception.produtos.ProdutoSkuDuplicadoException;
+import com.vittorhonorato.stockflow.integration.s3.S3StorageClient;
+import com.vittorhonorato.stockflow.integration.s3.S3UploadResult;
 import com.vittorhonorato.stockflow.mapper.ProdutoMapper;
 import com.vittorhonorato.stockflow.repository.CategoriaRepository;
 import com.vittorhonorato.stockflow.repository.FornecedorRepository;
@@ -20,6 +22,8 @@ import com.vittorhonorato.stockflow.service.ProdutoService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 
 
@@ -30,17 +34,30 @@ public class ProdutoServiceImpl implements ProdutoService {
     private final FornecedorRepository fornecedorRepository;
     private final ProdutoRepository produtoRepository;
     private final ProdutoMapper produtoMapper;
+    private final S3StorageClient s3StorageClient;
 
-    public ProdutoServiceImpl(CategoriaRepository categoriaRepository, FornecedorRepository fornecedorRepository, ProdutoRepository produtoRepository, ProdutoMapper produtoMapper) {
+    public ProdutoServiceImpl(
+            CategoriaRepository categoriaRepository,
+            FornecedorRepository fornecedorRepository,
+            ProdutoRepository produtoRepository,
+            ProdutoMapper produtoMapper,
+            S3StorageClient s3StorageClient
+    ) {
         this.categoriaRepository = categoriaRepository;
         this.fornecedorRepository = fornecedorRepository;
         this.produtoRepository = produtoRepository;
         this.produtoMapper = produtoMapper;
+        this.s3StorageClient = s3StorageClient;
     }
 
 
     @Override
     public ProdutoResponseDTO criar(ProdutoRequestDTO requestDTO) {
+        return criar(requestDTO, null);
+    }
+
+    @Override
+    public ProdutoResponseDTO criar(ProdutoRequestDTO requestDTO, MultipartFile imagem) {
         String skuNormalizado = normalizarTexto(requestDTO.sku());
         String nomeNormalizado = normalizarTexto(requestDTO.nome());
 
@@ -68,9 +85,21 @@ public class ProdutoServiceImpl implements ProdutoService {
         produto.setCategoria(categoria);
         produto.setFornecedor(fornecedor);
 
-        Produto produtoSave = produtoRepository.save(produto);
+        S3UploadResult uploadResult = uploadImagemSeInformada(imagem, skuNormalizado);
+        if (uploadResult != null) {
+            produto.setImagemKey(uploadResult.objectKey());
+            produto.setImagemUrl(uploadResult.objectUrl());
+        }
 
-        return produtoMapper.toResponseDTO(produtoSave);
+        try {
+            Produto produtoSave = produtoRepository.save(produto);
+            return produtoMapper.toResponseDTO(produtoSave);
+        } catch (RuntimeException exception) {
+            if (uploadResult != null) {
+                s3StorageClient.deleteObject(uploadResult.objectKey());
+            }
+            throw exception;
+        }
     }
 
     @Override
@@ -97,6 +126,11 @@ public class ProdutoServiceImpl implements ProdutoService {
 
     @Override
     public ProdutoResponseDTO atualizar(Long id, ProdutoRequestDTO requestDTO) {
+        return atualizar(id, requestDTO, null);
+    }
+
+    @Override
+    public ProdutoResponseDTO atualizar(Long id, ProdutoRequestDTO requestDTO, MultipartFile imagem) {
         Produto produto = getProduto(id);
 
         if (!produto.getAtivo()) {
@@ -126,6 +160,13 @@ public class ProdutoServiceImpl implements ProdutoService {
             throw new ProdutoFornecedorInativoException("Não é possível atualizar produto com fornecedor inativo");
         }
 
+        String imagemAnteriorKey = produto.getImagemKey();
+
+        S3UploadResult uploadResult = uploadImagemSeInformada(imagem, skuNormalizado);
+        if (uploadResult != null) {
+            produto.setImagemKey(uploadResult.objectKey());
+            produto.setImagemUrl(uploadResult.objectUrl());
+        }
 
         produtoMapper.updateEntityFromDTO(requestDTO, produto);
         produto.setNome(nomeNormalizado);
@@ -133,7 +174,20 @@ public class ProdutoServiceImpl implements ProdutoService {
         produto.setCategoria(categoria);
         produto.setFornecedor(fornecedor);
 
-        Produto produtoSave = produtoRepository.save(produto);
+        Produto produtoSave;
+        try {
+            produtoSave = produtoRepository.save(produto);
+        } catch (RuntimeException exception) {
+            if (uploadResult != null) {
+                s3StorageClient.deleteObject(uploadResult.objectKey());
+            }
+            throw exception;
+        }
+
+        if (uploadResult != null && StringUtils.hasText(imagemAnteriorKey)
+                && !imagemAnteriorKey.equals(uploadResult.objectKey())) {
+            s3StorageClient.deleteObject(imagemAnteriorKey);
+        }
 
         return produtoMapper.toResponseDTO(produtoSave);
     }
@@ -156,6 +210,14 @@ public class ProdutoServiceImpl implements ProdutoService {
 
     private String normalizarTexto(String texto) {
         return texto.trim();
+    }
+
+    private S3UploadResult uploadImagemSeInformada(MultipartFile imagem, String skuNormalizado) {
+        if (imagem == null || imagem.isEmpty()) {
+            return null;
+        }
+
+        return s3StorageClient.uploadProdutoImagem(imagem, skuNormalizado);
     }
 
 

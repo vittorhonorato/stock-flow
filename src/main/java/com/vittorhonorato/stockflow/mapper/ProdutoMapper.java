@@ -29,6 +29,7 @@ public class ProdutoMapper {
                 produto.getNome(),
                 produto.getSku(),
                 produto.getDescricao(),
+                produto.getImagemUrl(),
                 produto.getPrecoDeCusto(),
                 produto.getPrecoDeVenda(),
                 produto.getQuantidadeAtual(),

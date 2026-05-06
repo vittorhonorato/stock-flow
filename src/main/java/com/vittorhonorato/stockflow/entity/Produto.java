@@ -22,6 +22,12 @@ public class Produto {
     @Column(name = "descricao", length = 255)
     private String descricao;
 
+    @Column(name = "imagem_key", length = 512)
+    private String imagemKey;
+
+    @Column(name = "imagem_url", length = 1024)
+    private String imagemUrl;
+
     @Column(name = "preco_custo", nullable = false, precision = 10, scale = 2)
     private BigDecimal precoDeCusto;
 
@@ -89,6 +95,14 @@ public class Produto {
         return descricao;
     }
 
+    public String getImagemKey() {
+        return imagemKey;
+    }
+
+    public String getImagemUrl() {
+        return imagemUrl;
+    }
+
     public BigDecimal getPrecoDeCusto() {
         return precoDeCusto;
     }
@@ -139,6 +153,14 @@ public class Produto {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
+    }
+
+    public void setImagemKey(String imagemKey) {
+        this.imagemKey = imagemKey;
+    }
+
+    public void setImagemUrl(String imagemUrl) {
+        this.imagemUrl = imagemUrl;
     }
 
     public void setPrecoDeCusto(BigDecimal precoDeCusto) {

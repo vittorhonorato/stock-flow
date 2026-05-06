@@ -7,9 +7,11 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @RestController
@@ -23,12 +25,23 @@ public class ProdutoController {
         this.produtoService = produtoService;
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ProdutoResponseDTO> criarProduto(
             @Valid @RequestBody ProdutoRequestDTO requestDTO
     ) {
 
         ProdutoResponseDTO response = produtoService.criar(requestDTO);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ProdutoResponseDTO> criarProdutoComImagem(
+            @Valid @RequestPart("produto") ProdutoRequestDTO requestDTO,
+            @RequestPart(value = "imagem", required = false) MultipartFile imagem
+    ) {
+
+        ProdutoResponseDTO response = produtoService.criar(requestDTO, imagem);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -63,13 +76,25 @@ public class ProdutoController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("atualizar/{id}")
+    @PutMapping(value = "atualizar/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ProdutoResponseDTO> atualizarProduto(
             @PathVariable Long id,
             @Valid @RequestBody ProdutoRequestDTO request
     ) {
 
         ProdutoResponseDTO response = produtoService.atualizar(id, request);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping(value = "atualizar/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ProdutoResponseDTO> atualizarProdutoComImagem(
+            @PathVariable Long id,
+            @Valid @RequestPart("produto") ProdutoRequestDTO request,
+            @RequestPart(value = "imagem", required = false) MultipartFile imagem
+    ) {
+
+        ProdutoResponseDTO response = produtoService.atualizar(id, request, imagem);
 
         return ResponseEntity.ok(response);
     }

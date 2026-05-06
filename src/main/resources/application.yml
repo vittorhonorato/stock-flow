@@ -20,3 +20,12 @@ app:
   integrations:
     cnpja:
       base-url: https://open.cnpja.com
+    s3:
+      endpoint: http://localhost:4566
+      region: us-east-1
+      bucket: stockflow-produtos
+      access-key: test
+      secret-key: test
+      path-style-access: true
+      auto-create-bucket: true
+      public-base-url: http://localhost:4566

@@ -10,6 +10,8 @@ import com.vittorhonorato.stockflow.exception.fornecedores.FornecedorNaoEncontra
 import com.vittorhonorato.stockflow.exception.fornecedores.SituacaoCadastralFornecedorInvalidaException;
 import com.vittorhonorato.stockflow.exception.integration.CnpjaBadGatewayException;
 import com.vittorhonorato.stockflow.exception.integration.CnpjaServiceUnavailableException;
+import com.vittorhonorato.stockflow.exception.integration.S3BadGatewayException;
+import com.vittorhonorato.stockflow.exception.integration.S3ServiceUnavailableException;
 import com.vittorhonorato.stockflow.exception.produtos.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -212,6 +214,32 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CnpjaServiceUnavailableException.class)
     public ResponseEntity<ApiErrorResponse> handleCnpjaServiceUnavailable(
             CnpjaServiceUnavailableException exception,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(
+                HttpStatus.SERVICE_UNAVAILABLE,
+                exception.getMessage(),
+                request.getRequestURI(),
+                List.of()
+        );
+    }
+
+    @ExceptionHandler(S3BadGatewayException.class)
+    public ResponseEntity<ApiErrorResponse> handleS3BadGateway(
+            S3BadGatewayException exception,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(
+                HttpStatus.BAD_GATEWAY,
+                exception.getMessage(),
+                request.getRequestURI(),
+                List.of()
+        );
+    }
+
+    @ExceptionHandler(S3ServiceUnavailableException.class)
+    public ResponseEntity<ApiErrorResponse> handleS3ServiceUnavailable(
+            S3ServiceUnavailableException exception,
             HttpServletRequest request
     ) {
         return buildErrorResponse(
